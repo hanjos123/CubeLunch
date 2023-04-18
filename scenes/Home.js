@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import FoodCard from "./components/FoodCard";
 import { getDatabase, ref, get, child, onValue } from "firebase/database";
 import { database } from "../firebase";
 
-export default Home = ({ navigation }) => {
+const Home = ({ navigation }) => {
   const [foods, setFoods] = React.useState([]);
 
   React.useEffect(() => {
@@ -24,14 +24,48 @@ export default Home = ({ navigation }) => {
     <View
       style={{
         flex: 1,
-        justifyContent: "center",
+        justifyContent: "top",
         alignContent: "center",
       }}
     >
-      <Text>Home</Text>
-      {foods.map((food) => (
-        <FoodCard data={food} navigation={navigation} />
-      ))}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>Trưa nay ăn gì</Text>
+      </View>
+      <View style={styles.cardContainer}>
+        {foods.map((food) => (
+          <FoodCard data={food} navigation={navigation} />
+        ))}
+      </View>
+      <View style={styles.naviContainer}></View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: "#FF2900",
+    height: 90,
+    justifyContent: "center",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  headerTitle: {
+    color: "#FFF",
+    top: "25%",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  cardContainer: {
+    padding: "1%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  naviContainer: {
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+  },
+});
+
+export default Home;

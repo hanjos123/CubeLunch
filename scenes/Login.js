@@ -16,7 +16,7 @@ import { Icon } from "../assets";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 
-export default Login = ({ navigation }) => {
+const Login = ({ navigation }) => {
   const [email, setEmail] = React.useState("dangthevinh12@gmail.com");
   const [password, setPassword] = React.useState("Thevinh2");
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -145,3 +145,4 @@ const styles = StyleSheet.create({
     fill: "white",
   },
 });
+export default Login;

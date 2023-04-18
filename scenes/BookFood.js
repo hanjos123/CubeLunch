@@ -10,10 +10,38 @@ import {
 } from "react-native";
 import { IconButton, Checkbox, RadioButton, Button } from "react-native-paper";
 import { database } from "../firebase";
-import { onValue, ref } from "firebase/database";
+import { onValue, ref, set } from "firebase/database";
 import { COLOURS } from "../constant";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
 const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const generateId = () => {
+  const date = new Date();
+
+  const year = date.getFullYear(); // Năm
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng (phải thêm 1 vì tháng trong JavaScript bắt đầu từ 0)
+  const day = String(date.getDate()).padStart(2, "0"); // Ngày
+  const hours = String(date.getHours()).padStart(2, "0"); // Giờ
+  const minutes = String(date.getMinutes()).padStart(2, "0"); // Phút
+  const seconds = String(date.getSeconds()).padStart(2, "0"); // Giây
+
+  const formattedDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
+  return formattedDate;
+};
+const generateDate = () => {
+  const date = new Date();
+
+  // Lấy các thành phần của ngày hiện tại
+  const day = String(date.getDate()).padStart(2, "0"); // Ngày
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng (phải thêm 1 vì tháng trong JavaScript bắt đầu từ 0)
+  const year = date.getFullYear(); // Năm
+  const hours = String(date.getHours()).padStart(2, "0"); // Giờ
+  const minutes = String(date.getMinutes()).padStart(2, "0"); // Phút
+  const seconds = String(date.getSeconds()).padStart(2, "0"); // Giây
+
+  const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  return formattedDate;
+};
 const CustomCheckbox = ({ label, checked, onPress }) => {
   return (
     <TouchableOpacity style={styles.checkboxContainer} onPress={onPress}>
@@ -35,59 +63,51 @@ const BookFood = ({ route, navigation }) => {
   const [checked, setChecked] = React.useState(false);
   const [checked1, setChecked1] = React.useState(false);
   const [checked2, setChecked2] = React.useState(false);
-  const [foodTotal, setFoodTotal] = React.useState({ price: 30000 });
+  const [amount, setAmount] = React.useState(0);
 
   const handleCheckbox1Press = () => {
     setChecked1(!checked1);
-    setFoodTotal((prevFood) => {
-      return {
-        ...prevFood,
-        price: checked1 ? prevFood.price - 5000 : prevFood.price + 5000,
-      };
+    setAmount((preAmount) => {
+      return checked1 ? preAmount - 5000 : preAmount + 5000;
     });
   };
 
   const handleCheckbox2Press = () => {
     setChecked2(!checked2);
-    setFoodTotal((prevFood) => {
-      return {
-        ...prevFood,
-        price: checked2 ? prevFood.price - 5000 : prevFood.price + 5000,
-      };
+    setAmount((preAmount) => {
+      return checked2 ? preAmount - 5000 : preAmount + 5000;
     });
   };
 
-  const handleOrderPress = () => {
-    let selectedOption = "";
-    if (checked1 && !checked2) {
-      selectedOption = "Trứng ốp la";
-    } else if (!checked1 && checked2) {
-      selectedOption = "Chả trứng";
-    } else if (checked1 && checked2) {
-      selectedOption = "Trứng ốp la && Chả trứng";
+  const getUserToken = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem("userToken");
+      if (userToken !== null) {
+        return userToken;
+      }
+    } catch (error) {
+      console.error(error);
     }
-    const historyRef = database.database().ref("History");
-    historyRef
-      .push({
-        status: 1,
-      })
-      .then(() => {
-        console.log("Đã lưu dữ liệu vào Firebase");
-        console.log(
-          "Đặt món id =",
-          food.id,
-          "; Tên món =",
-          food.name,
-          "; Option =",
-          selectedOption,
-          "; Tổng tiền =",
-          foodTotal.price
-        );
-      })
-      .catch((error) => {
-        console.error("Lỗi khi lưu dữ liệu vào Firebase:", error);
-      });
   };
+
+  const handleOrderPress = async () => {
+    let selectedOptions = [];
+    if (checked1) {
+      selectedOptions.push("Trứng ốp la");
+    }
+    if (checked2) {
+      selectedOptions.push("Chả trứng");
+    }
+
+    const historyRef = ref(database, "History/" + generateId());
+    set(historyRef, {
+      userId: await getUserToken(),
+      optionFood: selectedOptions,
+      totalPrice: foodTotal,
+      created_at: generateDate(),
+    });
+  };
+
   const handleMomoTransfer = () => {
     const momoTransferLink =
       "momo://pay?partner=merchant_123&amount=100000&description=Đơn hàng số 1234c";
@@ -107,6 +127,7 @@ const BookFood = ({ route, navigation }) => {
       console.log(snapshot);
       const food = snapshot.val();
       setFood(food);
+      setAmount(food.price);
     });
   }, []);
   return (
@@ -232,7 +253,7 @@ const BookFood = ({ route, navigation }) => {
               backgroundColor: "#FF2900",
             }}
           >
-            Đặt món - {formatNumber(foodTotal.price)}
+            Đặt món - {formatNumber(amount)}
           </Button>
         </View>
       </View>

@@ -11,13 +11,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.cubelunch.app",
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,6 +27,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["@react-native-google-signin/google-signin"],
+    "extra": {
+      "eas": {
+        "projectId": "ba24f01f-9e43-4407-a2c4-8af3bf48f665"
+      }
     }
   }
 }

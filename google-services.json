@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "847299392402",
+    "firebase_url": "https://cubelunch-26d58-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "cubelunch-26d58",
+    "storage_bucket": "cubelunch-26d58.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:847299392402:android:e96d1c1b9a6f014c30874b",
+        "android_client_info": {
+          "package_name": "con.cubelunch.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "847299392402-p7oguvjghj63mrvincl79vgv7e240ntj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "con.cubelunch.app",
+            "certificate_hash": "a4b96847a865a36d99be712157e5fae3d7f0cd58"
+          }
+        },
+        {
+          "client_id": "847299392402-tqaouv65nuuerhed3qp051jholhqh1bp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEfJNkqvLfvTONh4JO4F-HNv94cqtFfsc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "847299392402-gf95mgmn3gk0up9b736bbhe31l8tro19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

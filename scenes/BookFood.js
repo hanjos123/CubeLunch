@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Linking,
+  ScrollView,
 } from "react-native";
 import { IconButton, Checkbox, RadioButton, Button } from "react-native-paper";
 import { database } from "../firebase";
@@ -28,20 +29,7 @@ const generateId = () => {
   const formattedDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
   return formattedDate;
 };
-const generateDate = () => {
-  const date = new Date();
-
-  // Lấy các thành phần của ngày hiện tại
-  const day = String(date.getDate()).padStart(2, "0"); // Ngày
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng (phải thêm 1 vì tháng trong JavaScript bắt đầu từ 0)
-  const year = date.getFullYear(); // Năm
-  const hours = String(date.getHours()).padStart(2, "0"); // Giờ
-  const minutes = String(date.getMinutes()).padStart(2, "0"); // Phút
-  const seconds = String(date.getSeconds()).padStart(2, "0"); // Giây
-
-  const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-  return formattedDate;
-};
+const dateTime = new Date().toLocaleString();
 const CustomCheckbox = ({ label, checked, onPress }) => {
   return (
     <TouchableOpacity style={styles.checkboxContainer} onPress={onPress}>
@@ -92,19 +80,21 @@ const BookFood = ({ route, navigation }) => {
 
   const handleOrderPress = async () => {
     let selectedOptions = [];
+    selectedOptions.push({ nameFood: food.name, price: food.price });
     if (checked1) {
-      selectedOptions.push("Trứng ốp la");
+      selectedOptions.push({ nameFood: "Trứng ốp la", price: 5000 });
     }
     if (checked2) {
-      selectedOptions.push("Chả trứng");
+      selectedOptions.push({ nameFood: "Chả trứng", price: 5000 });
     }
 
     const historyRef = ref(database, "History/" + generateId());
     set(historyRef, {
       userId: await getUserToken(),
       optionFood: selectedOptions,
-      totalPrice: foodTotal,
-      created_at: generateDate(),
+      totalPrice: amount,
+      created_at: dateTime,
+      status: 1,
     });
   };
 
@@ -131,133 +121,135 @@ const BookFood = ({ route, navigation }) => {
     });
   }, []);
   return (
-    <View
-      style={{
-        position: "relative",
-        width: Dimensions.get("window").width,
-        flex: 1,
-      }}
-    >
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          top: 50,
-          left: 20,
-          zIndex: 99,
-        }}
-        onPress={() => {
-          console.log(navigation);
-          navigation.navigate("Home");
-        }}
-      >
-        <IconButton icon="arrow-left" mode="contained" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          top: 50,
-          right: 20,
-          zIndex: 99,
-        }}
-      >
-        <IconButton icon="heart" mode="contained" />
-      </TouchableOpacity>
-      <Image
-        style={{
-          height: 375,
-          resizeMode: "cover",
-        }}
-        source={{
-          uri: food.image,
-        }}
-      />
-      <Button icon="camera" mode="contained" onPress={handleMomoTransfer}>
-        Press me
-      </Button>
-      <View style={styles.cardContainer}>
-        <Text style={styles.foodTitle}>{food.name}</Text>
-        <Text style={styles.foodTitle}>{food.price}</Text>
-      </View>
+    <ScrollView>
       <View
         style={{
-          height: "0.5%",
-          backgroundColor: COLOURS.backgroundMedium,
+          position: "relative",
+          width: Dimensions.get("window").width,
+          flex: 1,
         }}
-      ></View>
-      <View>
-        <Text
+      >
+        <TouchableOpacity
           style={{
-            color: COLOURS.darkBlue,
-            fontSize: 16,
-            marginLeft: "5%",
-            marginTop: "3%",
-            marginBottom: "1%",
-            fontWeight: "400",
+            position: "absolute",
+            top: 50,
+            left: 20,
+            zIndex: 99,
+          }}
+          onPress={() => {
+            console.log(navigation);
+            navigation.navigate("Home");
           }}
         >
-          Món thêm{" "}
-          <Text
-            style={{
-              color: COLOURS.darkBlue,
-              fontSize: 12,
-              fontWeight: "200",
-            }}
-          >
-            Không bắt buộc
-          </Text>
-        </Text>
-      </View>
-      <View>
-        <View>
-          <TouchableOpacity
-            style={styles.checkboxContainer}
-            onPress={handleCheckbox1Press}
-          >
-            <Checkbox
-              status={checked1 ? "checked" : "unchecked"}
-              onPress={handleCheckbox1Press}
-              color="#FF2900"
-              style={styles.checkbox}
-            />
-            <Text style={styles.labelOptions}>Trứng ốp la</Text>
-            <Text style={{ paddingRight: "3%" }}>+5.000</Text>
-          </TouchableOpacity>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={[styles.checkboxContainer, styles.lastCheckboxContainer]}
-            onPress={handleCheckbox2Press}
-          >
-            <Checkbox
-              status={checked2 ? "checked" : "unchecked"}
-              onPress={handleCheckbox2Press}
-              color="#FF2900"
-              style={styles.checkbox}
-            />
-            <Text style={styles.labelOptions}>Chả trứng</Text>
-            <Text style={{ paddingRight: "3%" }}>+5.000</Text>
-          </TouchableOpacity>
+          <IconButton icon="arrow-left" mode="contained" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            top: 50,
+            right: 20,
+            zIndex: 99,
+          }}
+        >
+          <IconButton icon="heart" mode="contained" />
+        </TouchableOpacity>
+        <Image
+          style={{
+            height: 375,
+            resizeMode: "cover",
+          }}
+          source={{
+            uri: food.image,
+          }}
+        />
+        <Button icon="camera" mode="contained" onPress={handleMomoTransfer}>
+          Press me
+        </Button>
+        <View style={styles.cardContainer}>
+          <Text style={styles.foodTitle}>{food.name}</Text>
+          <Text style={styles.foodTitle}>{food.price}</Text>
         </View>
         <View
           style={{
-            marginHorizontal: "3%",
-            justifyContent: "flex-end",
-            marginBottom: 16,
+            height: "0.5%",
+            backgroundColor: COLOURS.backgroundMedium,
           }}
-        >
-          <Button
-            mode="contained"
-            onPress={handleOrderPress}
+        ></View>
+        <View>
+          <Text
             style={{
-              borderRadius: 5,
-              backgroundColor: "#FF2900",
+              color: COLOURS.darkBlue,
+              fontSize: 16,
+              marginLeft: "5%",
+              marginTop: "3%",
+              marginBottom: "1%",
+              fontWeight: "400",
             }}
           >
-            Đặt món - {formatNumber(amount)}
-          </Button>
+            Món thêm{" "}
+            <Text
+              style={{
+                color: COLOURS.darkBlue,
+                fontSize: 12,
+                fontWeight: "200",
+              }}
+            >
+              Không bắt buộc
+            </Text>
+          </Text>
+        </View>
+        <View>
+          <View>
+            <TouchableOpacity
+              style={styles.checkboxContainer}
+              onPress={handleCheckbox1Press}
+            >
+              <Checkbox
+                status={checked1 ? "checked" : "unchecked"}
+                onPress={handleCheckbox1Press}
+                color="#FF2900"
+                style={styles.checkbox}
+              />
+              <Text style={styles.labelOptions}>Trứng ốp la</Text>
+              <Text style={{ paddingRight: "3%" }}>+5.000</Text>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity
+              style={[styles.checkboxContainer, styles.lastCheckboxContainer]}
+              onPress={handleCheckbox2Press}
+            >
+              <Checkbox
+                status={checked2 ? "checked" : "unchecked"}
+                onPress={handleCheckbox2Press}
+                color="#FF2900"
+                style={styles.checkbox}
+              />
+              <Text style={styles.labelOptions}>Chả trứng</Text>
+              <Text style={{ paddingRight: "3%" }}>+5.000</Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              marginHorizontal: "3%",
+              justifyContent: "flex-end",
+              marginBottom: 16,
+            }}
+          >
+            <Button
+              mode="contained"
+              onPress={handleOrderPress}
+              style={{
+                borderRadius: 5,
+                backgroundColor: "#FF2900",
+              }}
+            >
+              Đặt món - {formatNumber(amount)}
+            </Button>
+          </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 const styles = StyleSheet.create({

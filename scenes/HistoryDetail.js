@@ -30,7 +30,6 @@ const HistoryDetail = ({ route, navigation }) => {
       const [firstOptions] =
         optionFood.length > 0 ? optionFood.slice(0, 1) : null;
       const restOptions = optionFood.length > 1 ? optionFood.slice(1) : null;
-      console.log(restOptions);
       setHistorys(history);
       setfirstOption(firstOptions);
       setRestOptions(restOptions);

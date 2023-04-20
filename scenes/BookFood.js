@@ -14,7 +14,6 @@ import { database } from "../firebase";
 import { onValue, ref, set } from "firebase/database";
 import { COLOURS } from "../constant";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
-import NavigatorBottom from "./components/Navigator";
 
 const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 const generateId = () => {
@@ -49,24 +48,30 @@ const CustomCheckbox = ({ label, checked, onPress }) => {
 const BookFood = ({ route, navigation }) => {
   const { foodID } = route.params;
   const [food, setFood] = React.useState({});
+  const [optionFood, setOptionFood] = React.useState([]);
   const [checked, setChecked] = React.useState(false);
-  const [checked1, setChecked1] = React.useState(false);
-  const [checked2, setChecked2] = React.useState(false);
   const [amount, setAmount] = React.useState(0);
+  const [checkedItems, setCheckedItems] = React.useState(
+    new Array(optionFood.length).fill(false)
+  );
 
-  const handleCheckbox1Press = () => {
-    setChecked1(!checked1);
-    setAmount((preAmount) => {
-      return checked1 ? preAmount - 5000 : preAmount + 5000;
+  React.useEffect(() => {
+    const foodRef = ref(database, "Food/" + foodID);
+    onValue(foodRef, (snapshot) => {
+      console.log(snapshot);
+      const food = snapshot.val();
+      setFood(food);
+      setAmount(food.price);
     });
-  };
+  }, []);
 
-  const handleCheckbox2Press = () => {
-    setChecked2(!checked2);
-    setAmount((preAmount) => {
-      return checked2 ? preAmount - 5000 : preAmount + 5000;
+  React.useEffect(() => {
+    const optionFoodRef = ref(database, "OptionFood");
+    onValue(optionFoodRef, (snapshot) => {
+      const optionFood = snapshot.val();
+      setOptionFood(optionFood);
     });
-  };
+  }, []);
 
   const getUserToken = async () => {
     try {
@@ -82,13 +87,14 @@ const BookFood = ({ route, navigation }) => {
   const handleOrderPress = async () => {
     let selectedOptions = [];
     selectedOptions.push({ nameFood: food.name, price: food.price });
-    if (checked1) {
-      selectedOptions.push({ nameFood: "Trứng ốp la", price: 5000 });
-    }
-    if (checked2) {
-      selectedOptions.push({ nameFood: "Chả trứng", price: 5000 });
-    }
-
+    selectedOptions.push(
+      ...optionFood
+        .filter((option, index) => checkedItems[index])
+        .map((option) => ({
+          nameFood: option.nameOption,
+          price: option.priceOption,
+        }))
+    );
     const historyRef = ref(database, "History/" + generateId());
     set(historyRef, {
       userId: await getUserToken(),
@@ -98,7 +104,17 @@ const BookFood = ({ route, navigation }) => {
       status: 1,
     });
   };
-
+  const handleCheckbox = (index) => {
+    const newCheckedItems = [...checkedItems];
+    newCheckedItems[index] = !newCheckedItems[index];
+    setCheckedItems(newCheckedItems);
+    const newAmount =
+      amount +
+      (newCheckedItems[index]
+        ? optionFood[index].priceOption
+        : -optionFood[index].priceOption);
+    setAmount(newAmount);
+  };
   const handleMomoTransfer = () => {
     const momoTransferLink =
       "momo://pay?partner=merchant_123&amount=100000&description=Đơn hàng số 1234c";
@@ -112,15 +128,6 @@ const BookFood = ({ route, navigation }) => {
     //   }
     // });
   };
-  React.useEffect(() => {
-    const foodRef = ref(database, "Food/" + foodID);
-    onValue(foodRef, (snapshot) => {
-      console.log(snapshot);
-      const food = snapshot.val();
-      setFood(food);
-      setAmount(food.price);
-    });
-  }, []);
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
@@ -201,35 +208,28 @@ const BookFood = ({ route, navigation }) => {
         </View>
         <View>
           <View>
-            <TouchableOpacity
-              style={styles.checkboxContainer}
-              onPress={handleCheckbox1Press}
-            >
-              <Checkbox
-                status={checked1 ? "checked" : "unchecked"}
-                onPress={handleCheckbox1Press}
-                color="#FF2900"
-                style={styles.checkbox}
-              />
-              <Text style={styles.labelOptions}>Trứng ốp la</Text>
-              <Text style={{ paddingRight: "3%" }}>+5.000</Text>
-            </TouchableOpacity>
+            {optionFood &&
+              optionFood.map((food, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.checkboxContainer}
+                  onPress={() => handleCheckbox(index)}
+                >
+                  <Checkbox
+                    status={checkedItems[index] ? "checked" : "unchecked"}
+                    onPress={() => handleCheckbox(index)}
+                    color="#FF2900"
+                    style={styles.checkbox}
+                  />
+                  <Text style={styles.labelOptions}>{food.nameOption}</Text>
+                  <Text style={{ paddingRight: "3%" }}>
+                    + {food.priceOption}
+                  </Text>
+                </TouchableOpacity>
+              ))}
           </View>
-          <View>
-            <TouchableOpacity
-              style={[styles.checkboxContainer, styles.lastCheckboxContainer]}
-              onPress={handleCheckbox2Press}
-            >
-              <Checkbox
-                status={checked2 ? "checked" : "unchecked"}
-                onPress={handleCheckbox2Press}
-                color="#FF2900"
-                style={styles.checkbox}
-              />
-              <Text style={styles.labelOptions}>Chả trứng</Text>
-              <Text style={{ paddingRight: "3%" }}>+5.000</Text>
-            </TouchableOpacity>
-          </View>
+        </View>
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
           <View
             style={{
               marginHorizontal: "3%",
@@ -250,9 +250,6 @@ const BookFood = ({ route, navigation }) => {
               </Button>
             </View>
           </View>
-        </View>
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <NavigatorBottom />
         </View>
       </View>
     </ScrollView>

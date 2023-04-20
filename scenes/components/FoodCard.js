@@ -1,9 +1,8 @@
-import { TouchableOpacity, View, Text, Image } from "react-native";
-import { COLOURS } from "../../constant";
+import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+import { COLOURS } from "../../utils/constant";
+import { formatNumber } from "../../utils/helpers"
 
-const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-export default FoodCard = ({ data, navigation }) => {
+const FoodCard = ({ data, navigation }) => {
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate("BookFood", { foodID: data.id })}
@@ -26,19 +25,29 @@ export default FoodCard = ({ data, navigation }) => {
       >
         <Image
           style={{
-            width: 100,
-            height: 190,
-            resizeMode: "contain",
+            width: "100%",
+            height: 200,
+            resizeMode: "cover",
+            borderRadius: 10,
           }}
           source={{
             uri: data.image,
           }}
         />
       </View>
-      <View>
+      <View style={styles.textContainer}>
         <Text>{data.name}</Text>
-        <Text>{formatNumber(data.price)}</Text>
+        <Text style={{ fontWeight: "700" }}>{formatNumber(data.price)}</Text>
       </View>
     </TouchableOpacity>
   );
 };
+const styles = StyleSheet.create({
+  textContainer: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginLeft: "5%",
+  },
+});
+
+export default FoodCard;

@@ -9,21 +9,21 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { TextInput, IconButton } from "react-native-paper";
-import { COLOURS } from "../constant";
-import { LinearGradient } from "expo-linear-gradient";
+import { COLOURS } from "../utils/constant";
 import { Dimensions, Image, AlertIOS } from "react-native";
 import { Icon } from "../assets";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
-export default Login = ({ navigation }) => {
+const Login = ({ navigation }) => {
   const [email, setEmail] = React.useState("dangthevinh12@gmail.com");
   const [password, setPassword] = React.useState("Thevinh2");
   const [errorMessage, setErrorMessage] = React.useState("");
-
   const handleLogin = async () => {
     try {
       const data = await signInWithEmailAndPassword(auth, email, password);
+      await AsyncStorage.setItem("userToken", data.user.uid);
       navigation.replace("Home");
       console.log(data);
     } catch (error) {
@@ -145,3 +145,4 @@ const styles = StyleSheet.create({
     fill: "white",
   },
 });
+export default Login;

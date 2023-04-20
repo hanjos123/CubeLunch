@@ -14,6 +14,7 @@ import { COLOURS } from "../constant";
 import QRMomo from "./components/QRMomo";
 import { PAYMENT_STATUS } from "../ultis/constant";
 import moment from "moment";
+import NavigatorBottom from "./components/Navigator";
 
 const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 const HistoryDetail = ({ route, navigation }) => {
@@ -36,7 +37,7 @@ const HistoryDetail = ({ route, navigation }) => {
     });
   }, []);
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
         style={{
           flex: 1,
@@ -232,6 +233,9 @@ const HistoryDetail = ({ route, navigation }) => {
           </View>
         </View> */}
         <QRMomo />
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <NavigatorBottom />
+        </View>
       </View>
     </ScrollView>
   );

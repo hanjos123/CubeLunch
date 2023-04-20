@@ -14,6 +14,7 @@ import { database } from "../firebase";
 import { onValue, ref, set } from "firebase/database";
 import { COLOURS } from "../constant";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import NavigatorBottom from "./components/Navigator";
 
 const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 const generateId = () => {
@@ -121,7 +122,7 @@ const BookFood = ({ route, navigation }) => {
     });
   }, []);
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
         style={{
           position: "relative",
@@ -236,17 +237,22 @@ const BookFood = ({ route, navigation }) => {
               marginBottom: 16,
             }}
           >
-            <Button
-              mode="contained"
-              onPress={handleOrderPress}
-              style={{
-                borderRadius: 5,
-                backgroundColor: "#FF2900",
-              }}
-            >
-              Đặt món - {formatNumber(amount)}
-            </Button>
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+              <Button
+                mode="contained"
+                onPress={handleOrderPress}
+                style={{
+                  borderRadius: 5,
+                  backgroundColor: "#FF2900",
+                }}
+              >
+                Đặt món - {formatNumber(amount)}
+              </Button>
+            </View>
           </View>
+        </View>
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <NavigatorBottom />
         </View>
       </View>
     </ScrollView>

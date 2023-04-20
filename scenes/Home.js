@@ -1,14 +1,10 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  NavigationContainer,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import FoodCard from "./components/FoodCard";
 import { getDatabase, ref, get, child, onValue } from "firebase/database";
 import { database } from "../firebase";
+import NavigatorBottom from "./components/Navigator";
+
 const Home = ({ navigation }) => {
   const [foods, setFoods] = React.useState([]);
 
@@ -26,7 +22,7 @@ const Home = ({ navigation }) => {
   }, []);
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
         style={{
           flex: 1,
@@ -41,6 +37,9 @@ const Home = ({ navigation }) => {
           {foods.map((food) => (
             <FoodCard data={food} navigation={navigation} />
           ))}
+        </View>
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <NavigatorBottom />
         </View>
       </View>
     </ScrollView>

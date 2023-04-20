@@ -42,7 +42,7 @@ const HistoryOrder = ({ navigation }) => {
   }, []);
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
         style={{
           flex: 1,
@@ -80,7 +80,9 @@ const HistoryOrder = ({ navigation }) => {
             <HistoryCard data={setHistorys} navigation={navigation} />
           ))}
         </View>
-        <NavigatorBottom />
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <NavigatorBottom />
+        </View>
       </View>
     </ScrollView>
   );

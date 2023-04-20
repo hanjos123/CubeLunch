@@ -1,15 +1,4 @@
-import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
 import * as React from "react";
-import { getDatabase, ref, get, child, onValue } from "firebase/database";
-import { COLOURS } from "./constant";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { Home, Login, BookFood, HistoryList, HistoryDetail } from "./scenes";

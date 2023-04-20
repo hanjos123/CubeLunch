@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { TextInput, IconButton } from "react-native-paper";
-import { COLOURS } from "../constant";
+import { COLOURS } from "../utils/constant";
 import { Dimensions, Image, AlertIOS } from "react-native";
 import { Icon } from "../assets";
 import { signInWithEmailAndPassword } from "firebase/auth";

@@ -10,9 +10,9 @@ import {
 import { database } from "../firebase";
 import { IconButton } from "react-native-paper";
 import { onValue, ref, set } from "firebase/database";
-import { COLOURS } from "../constant";
+import { COLOURS } from "../utils/constant";
 import QRMomo from "./components/QRMomo";
-import { PAYMENT_STATUS } from "../ultis/constant";
+import { PAYMENT_STATUS } from "../utils/constant";
 import moment from "moment";
 import NavigatorBottom from "./components/Navigator";
 

@@ -12,24 +12,12 @@ import {
 import { IconButton, Checkbox, RadioButton, Button } from "react-native-paper";
 import { database } from "../firebase";
 import { onValue, ref, set } from "firebase/database";
-import { COLOURS } from "../constant";
+import { COLOURS } from "../utils/constant";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 import NavigatorBottom from "./components/Navigator";
+import { formatNumber, generateId } from "../utils/helpers"
 
-const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-const generateId = () => {
-  const date = new Date();
 
-  const year = date.getFullYear(); // Năm
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng (phải thêm 1 vì tháng trong JavaScript bắt đầu từ 0)
-  const day = String(date.getDate()).padStart(2, "0"); // Ngày
-  const hours = String(date.getHours()).padStart(2, "0"); // Giờ
-  const minutes = String(date.getMinutes()).padStart(2, "0"); // Phút
-  const seconds = String(date.getSeconds()).padStart(2, "0"); // Giây
-
-  const formattedDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
-  return formattedDate;
-};
 const dateTime = new Date().toLocaleString();
 const CustomCheckbox = ({ label, checked, onPress }) => {
   return (

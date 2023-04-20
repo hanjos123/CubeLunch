@@ -1,9 +1,7 @@
 import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
-import { COLOURS } from "../../constant";
-import { PAYMENT_STATUS } from "../../ultis/constant";
+import { COLOURS, PAYMENT_STATUS } from "../../utils/constant";
+import { formatNumber } from "../../utils/helpers";
 import moment from "moment";
-
-const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 const HistoryCard = ({ data, navigation }) => {
   return (

@@ -1,7 +1,6 @@
 import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
-import { COLOURS } from "../../constant";
-
-const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+import { COLOURS } from "../../utils/constant";
+import { formatNumber } from "../../utils/helpers"
 
 const FoodCard = ({ data, navigation }) => {
   return (
@@ -28,7 +27,8 @@ const FoodCard = ({ data, navigation }) => {
           style={{
             width: "100%",
             height: 200,
-            resizeMode: "contain",
+            resizeMode: "cover",
+            borderRadius: 10,
           }}
           source={{
             uri: data.image,

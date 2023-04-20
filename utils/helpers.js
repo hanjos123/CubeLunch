@@ -3,8 +3,8 @@
  * @param number
  * @returns Number số sau khi format
  */
-export const formatNumber = (number) =>
-  number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+export const formatNumber = (number, comma = ',') =>
+  number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, comma);
 
 /**
  * Lấy ra id mới

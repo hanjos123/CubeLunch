@@ -4,6 +4,7 @@ export const COLOURS = {
   primary3: "#FFC3C3",
   secondary: "#D2EBF4",
   darkBlue: "#424965",
+  grey: "#928D8D",
   neutral1: "#F8F8F8",
   neutral2: "#EEEEEE",
   neutral3: "#C7C7C7",

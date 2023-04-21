@@ -9,20 +9,21 @@ import {
 } from "react-native";
 import { IconButton } from "react-native-paper";
 import HistoryCard from "./components/HistoryCard";
-import { ref, onValue } from "firebase/database";
+import { ref, get, onValue } from "firebase/database";
 import { database } from "../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
-import NavigatorBottom from "./components/Navigator";
 import moment from "moment";
+import { LinearGradient } from "expo-linear-gradient";
 
-const HistoryOrder = ({ navigation }) => {
-  const [historys, setHistorys] = React.useState([]);
+const HistoryList = ({ navigation }) => {
+  const [historyUsers, setHistoryUsers] = React.useState([]);
+  const [userId, setUserToken] = React.useState(null);
 
   const getUserToken = async () => {
     try {
       const userToken = await AsyncStorage.getItem("userToken");
       if (userToken !== null) {
-        return userToken;
+        setUserToken(userToken);
       }
     } catch (error) {
       console.error(error);
@@ -30,17 +31,22 @@ const HistoryOrder = ({ navigation }) => {
   };
 
   React.useEffect(() => {
-    const historyRef = ref(database, "History");
-    onValue(historyRef, (snapshot) => {
-      const data = snapshot.val();
-      const history = Object.keys(data).map((key) => ({
-        id: key,
-        ...data[key],
-      }));
-      setHistorys(history);
-    });
+    getUserToken();
   }, []);
 
+  React.useEffect(() => {
+    if (userId !== null) {
+      const historyRef = ref(database, "HistoryUser/" + userId);
+      onValue(historyRef, (snapshot) => {
+        const data = snapshot.val();
+        const history = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setHistoryUsers(history);
+      });
+    }
+  }, [userId]);
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
@@ -50,7 +56,12 @@ const HistoryOrder = ({ navigation }) => {
           alignContent: "center",
         }}
       >
-        <View style={styles.headerContainer}>
+        <LinearGradient
+          colors={["#FF7682", "#FF2900"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerContainer}
+        >
           <TouchableOpacity
             style={{
               position: "absolute",
@@ -65,23 +76,26 @@ const HistoryOrder = ({ navigation }) => {
             <IconButton icon="arrow-left" mode="contained" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Lịch sử giao dịch</Text>
-        </View>
+        </LinearGradient>
         <View style={styles.cardContainer}>
           <View>
             <Text style={{ marginLeft: 10, marginBottom: 10 }}>
               <Text>
-                {moment(historys[0]?.created_at, "DD/MM/YYYY, HH:mm:ss").format(
-                  "[thg] M YYYY"
-                )}
+                {moment(historyUsers[0]?.created_at, [
+                  "MM/DD/YYYY, h:mm:ss A",
+                  "MM/DD/YYYY, h:mm:ss",
+                  "MM/DD/YYYY, h:mm:ss a",
+                ]).format("[thg] M YYYY")}
               </Text>
             </Text>
           </View>
-          {historys.map((setHistorys) => (
-            <HistoryCard data={setHistorys} navigation={navigation} />
+          {historyUsers?.map((setHistorys) => (
+            <HistoryCard
+              key={setHistorys.id}
+              data={setHistorys}
+              navigation={navigation}
+            />
           ))}
-        </View>
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <NavigatorBottom />
         </View>
       </View>
     </ScrollView>
@@ -115,4 +129,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HistoryOrder;
+export default HistoryList;

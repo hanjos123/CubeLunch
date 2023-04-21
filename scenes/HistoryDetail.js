@@ -10,31 +10,79 @@ import {
 import { database } from "../firebase";
 import { IconButton } from "react-native-paper";
 import { onValue, ref, set } from "firebase/database";
-import { COLOURS } from "../utils/constant";
 import QRMomo from "./components/QRMomo";
-import { PAYMENT_STATUS } from "../utils/constant";
+import { PAYMENT_STATUS, PAYMENT_TEXT_STATUS } from "../utils/constant";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import { formatNumber } from "../utils/helpers";
 import moment from "moment";
-import NavigatorBottom from "./components/Navigator";
+import { COLOURS } from "../utils/constant";
+import { LinearGradient } from "expo-linear-gradient";
 
-const formatNumber = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 const HistoryDetail = ({ route, navigation }) => {
   const { historyID } = route.params;
-  const [history, setHistorys] = React.useState({});
-  const [firstOption, setfirstOption] = React.useState({});
+  const [historys, setHistorys] = React.useState({});
+  const [buyerInfoList, setbuyerInfoList] = React.useState([]);
+  const [firstOption, setFirstOption] = React.useState({});
   const [restOption, setRestOptions] = React.useState([]);
+  const [userId, setUserToken] = React.useState(null);
+
+  const getUserToken = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem("userToken");
+      if (userToken !== null) {
+        setUserToken(userToken);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   React.useEffect(() => {
-    const historyRef = ref(database, "History/" + historyID);
-    onValue(historyRef, (snapshot) => {
-      const history = snapshot.val();
-      const optionFood = history.optionFood || []; // lấy mảng optionFood từ đối tượng history
-      const [firstOptions] =
-        optionFood.length > 0 ? optionFood.slice(0, 1) : null;
-      const restOptions = optionFood.length > 1 ? optionFood.slice(1) : null;
-      setHistorys(history);
-      setfirstOption(firstOptions);
-      setRestOptions(restOptions);
+    getUserToken();
+  }, []);
+
+  React.useEffect(() => {
+    const buyerInfoListRef = ref(database, "Buyer");
+    onValue(buyerInfoListRef, (snapshot) => {
+      const data = snapshot.val();
+      const buyerInfoList = Object.keys(data).map((key) => ({
+        id: key,
+        ...data[key],
+      }));
+      setbuyerInfoList(buyerInfoList);
     });
   }, []);
+  const checkBuyer = () => {
+    const matchingBuyers = [];
+    const matchingCheck = buyerInfoList.filter((buyer) => {
+      if (buyer.id === historys?.buyerId) {
+        matchingBuyers.push(buyer.name);
+      }
+    });
+    if (matchingBuyers.length > 0) {
+      return matchingBuyers[0];
+    } else {
+      return "Không có ai mua cả";
+    }
+  };
+
+  React.useEffect(() => {
+    const historyRef = ref(database, "HistoryUser/" + userId + "/" + historyID);
+    onValue(historyRef, (snapshot) => {
+      const history = snapshot.val();
+      const optionFood =
+        history && history.optionFood ? history.optionFood : [];
+      const [firstOptions] =
+        optionFood.length > 9 ? optionFood.slice(0, 1) : null;
+      const restOptions = optionFood.length > 1 ? optionFood.slice(1) : null;
+      setFirstOption(firstOptions);
+      setRestOptions(restOptions);
+      setHistorys(history);
+    });
+  }, [userId]);
+
+  console.log(historys);
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
@@ -47,7 +95,12 @@ const HistoryDetail = ({ route, navigation }) => {
           flex: 1,
         }}
       >
-        <View style={styles.headerContainer}>
+        <LinearGradient
+          colors={["#FF7682", "#FF2900"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerContainer}
+        >
           <TouchableOpacity
             style={{
               position: "absolute",
@@ -62,7 +115,7 @@ const HistoryDetail = ({ route, navigation }) => {
             <IconButton icon="arrow-left" mode="contained" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Lịch sử giao dịch</Text>
-        </View>
+        </LinearGradient>
         <View
           style={{
             marginTop: 20,
@@ -77,7 +130,7 @@ const HistoryDetail = ({ route, navigation }) => {
               marginLeft: 10,
             }}
           >
-            {firstOption && (
+            {
               <>
                 <Text
                   style={{
@@ -88,15 +141,17 @@ const HistoryDetail = ({ route, navigation }) => {
                     marginLeft: 3,
                   }}
                 >
-                  {firstOption.nameFood}
+                  {firstOption?.nameFood}
                 </Text>
                 <Text>
-                  {moment(history.created_at, "DD/MM/YYYY, HH:mm:ss").format(
-                    "DD [thg] M YYYY HH:mm"
-                  )}
+                  {moment(history?.created_at, [
+                    "MM/DD/YYYY, h:mm:ss A",
+                    "MM/DD/YYYY, h:mm:ss",
+                    "MM/DD/YYYY, h:mm:ss a",
+                  ]).format("DD [thg] M YYYY HH:mm")}
                 </Text>
               </>
-            )}
+            }
           </View>
           <View
             style={{
@@ -105,16 +160,19 @@ const HistoryDetail = ({ route, navigation }) => {
               marginRight: 10,
             }}
           >
-            <Text>{history.totalPrice}</Text>
+            <Text>{historys?.totalPrice}</Text>
             <Text
               style={{
-                color: history.status === 1 ? "red" : "green",
+                color:
+                  historys?.status === PAYMENT_STATUS.UNPAID
+                    ? COLOURS.primary
+                    : COLOURS.green,
                 textTransform: "uppercase",
               }}
             >
-              {history.status === 1
-                ? PAYMENT_STATUS.UNPAID
-                : PAYMENT_STATUS.PAID}
+              {historys?.status === PAYMENT_STATUS.UNPAID
+                ? PAYMENT_TEXT_STATUS.UNPAID
+                : PAYMENT_TEXT_STATUS.PAID}
             </Text>
           </View>
         </View>
@@ -141,33 +199,48 @@ const HistoryDetail = ({ route, navigation }) => {
                 marginRight: 10,
               }}
             >
-              {restOption &&
-                restOption.map((food) => (
-                  <Text
-                    style={{
-                      marginTop: 10,
-                    }}
-                  >
-                    - {food.nameFood}
-                  </Text>
-                ))}
+              <Text
+                style={{
+                  marginTop: 10,
+                }}
+              >
+                - {firstOption?.nameFood}
+              </Text>
+              {restOption?.map((food, index) => (
+                <Text
+                  style={{
+                    marginTop: 10,
+                  }}
+                  key={index}
+                >
+                  - {food.nameFood}
+                </Text>
+              ))}
             </View>
             <View
               style={{
                 justifyContent: "flex-start",
+                alignContent: "flex-end",
                 marginRight: 10,
               }}
             >
-              {restOption &&
-                restOption.map((food) => (
-                  <Text
-                    style={{
-                      marginTop: 10,
-                    }}
-                  >
-                    {formatNumber(food.price)} đ
-                  </Text>
-                ))}
+              <Text
+                style={{
+                  marginTop: 10,
+                }}
+              >
+                {firstOption?.price} đ
+              </Text>
+              {restOption?.map((food, index) => (
+                <Text
+                  style={{
+                    marginTop: 10,
+                  }}
+                  key={index}
+                >
+                  {formatNumber(food.price)} đ
+                </Text>
+              ))}
             </View>
           </View>
         </View>
@@ -204,37 +277,12 @@ const HistoryDetail = ({ route, navigation }) => {
                   marginLeft: 3,
                 }}
               >
-                Đặng Thế Vinh
+                {checkBuyer()}
               </Text>
             </View>
           </View>
         </View>
-        {/*   <View style={{ marginTop: 20 }}>
-         <View
-            style={{
-              justifyContent: "flex-start",
-              marginLeft: 10,
-            }}
-          >
-            <Text style={styles.labelOptions}>Momo</Text>
-          </View>
-          <View
-            style={{
-              marginTop: 20,
-              flexDirection: "column",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={{ margin: "auto" }}> QR </Text>
-            <Text> Số điện thoại </Text>
-            <Text> Đặng Thế Vinh </Text>
-          </View>
-        </View> */}
-        <QRMomo />
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <NavigatorBottom />
-        </View>
+        {/* <QRMomo /> */}
       </View>
     </ScrollView>
   );

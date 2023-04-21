@@ -1,5 +1,9 @@
 import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
-import { COLOURS, PAYMENT_STATUS } from "../../utils/constant";
+import {
+  COLOURS,
+  PAYMENT_STATUS,
+  PAYMENT_TEXT_STATUS,
+} from "../../utils/constant";
 import { formatNumber } from "../../utils/helpers";
 import moment from "moment";
 
@@ -43,9 +47,11 @@ const HistoryCard = ({ data, navigation }) => {
             {data.optionFood[0].nameFood}
           </Text>
           <Text>
-            {moment(data.created_at, "DD/MM/YYYY, HH:mm:ss").format(
-              "DD [thg] M YYYY HH:mm"
-            )}
+            {moment(data?.created_at, [
+              "MM/DD/YYYY, h:mm:ss A",
+              "MM/DD/YYYY, h:mm:ss",
+              "MM/DD/YYYY, h:mm:ss a",
+            ]).format("DD [thg] M YYYY HH:mm")}
           </Text>
         </View>
         <View
@@ -59,12 +65,17 @@ const HistoryCard = ({ data, navigation }) => {
           <Text>{formatNumber(data.totalPrice)}</Text>
           <Text
             style={{
-              justifyContent: "flex-end",
-              color: data.status === 1 ? "red" : "green",
+              color:
+                data.status === PAYMENT_STATUS.UNPAID
+                  ? COLOURS.primary
+                  : COLOURS.green,
               textTransform: "uppercase",
+              justifyContent: "flex-end",
             }}
           >
-            {data.status === 1 ? PAYMENT_STATUS.UNPAID : PAYMENT_STATUS.PAID}
+            {data.status === PAYMENT_STATUS.UNPAID
+              ? PAYMENT_TEXT_STATUS.UNPAID
+              : PAYMENT_TEXT_STATUS.PAID}
           </Text>
         </View>
       </View>

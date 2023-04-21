@@ -4,6 +4,7 @@ export const COLOURS = {
   primary3: "#FFC3C3",
   secondary: "#D2EBF4",
   darkBlue: "#424965",
+  grey: "#928D8D",
   neutral1: "#F8F8F8",
   neutral2: "#EEEEEE",
   neutral3: "#C7C7C7",
@@ -26,12 +27,15 @@ export const DAY_SHOW_FOOD = {
   THURSDAY: 4, // Thứ 5
   FRIDAY: 5, // Thứ 6
   SATURDAY: 6, // Thứ 7
-  ALL_DAY: 9 // Luôn luôn hiện
-}
+  ALL_DAY: 9, // Luôn luôn hiện
+};
 
-export const PAYMENT_STATUS = {
+export const PAYMENT_TEXT_STATUS = {
   UNPAID: "CHƯA THANH TOÁN",
   PAID: "ĐÃ THANH TOÁN",
 };
 
-
+export const PAYMENT_STATUS = {
+  UNPAID: 1,
+  PAID: 2,
+};

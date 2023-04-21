@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import FoodCard from "./components/FoodCard";
 import { getDatabase, ref, get, child, onValue } from "firebase/database";
 import { database } from "../firebase";
-import { DAY_SHOW_FOOD } from "../utils/constant"
+import { DAY_SHOW_FOOD } from "../utils/constant";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Home = ({ navigation }) => {
   const [foods, setFoods] = React.useState([]);
@@ -30,15 +31,20 @@ const Home = ({ navigation }) => {
           alignContent: "center",
         }}
       >
-        <View style={styles.headerContainer}>
+        <LinearGradient
+          colors={["#FF7682", "#FF2900"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerContainer}
+        >
           <Text style={styles.headerTitle}>Trưa nay ăn gì</Text>
-        </View>
+        </LinearGradient>
         <View style={styles.cardContainer}>
           {foods.map((food) =>
-            (
-              food.dayShow == new Date().getDay() || food.dayShow == DAY_SHOW_FOOD.ALL_DAY  ?
-              <FoodCard data={food} navigation={navigation} key={food.id} /> : null
-            )              
+            food.dayShow == new Date().getDay() ||
+            food.dayShow == DAY_SHOW_FOOD.ALL_DAY ? (
+              <FoodCard data={food} navigation={navigation} key={food.id} />
+            ) : null
           )}
         </View>
       </View>

@@ -9,44 +9,32 @@ import {
   Linking,
   ScrollView,
 } from "react-native";
-import { IconButton, Checkbox, RadioButton, Button } from "react-native-paper";
+import { IconButton, Checkbox, Button, Snackbar } from "react-native-paper";
 import { database } from "../firebase";
 import { onValue, ref, set } from "firebase/database";
 import { COLOURS } from "../utils/constant";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
-import { formatNumber, generateId } from "../utils/helpers"
-
+import { formatNumber } from "../utils/helpers";
+import moment from "moment/moment";
 
 const dateTime = new Date().toLocaleString();
-const CustomCheckbox = ({ label, checked, onPress }) => {
-  return (
-    <TouchableOpacity style={styles.checkboxContainer} onPress={onPress}>
-      <Checkbox
-        status={checked ? "checked" : "unchecked"}
-        onPress={onPress}
-        color="#FF2900"
-        style={styles.checkbox}
-      />
-      <View>
-        <Text style={styles.labelOptions}>{label}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
 const BookFood = ({ route, navigation }) => {
   const { foodID } = route.params;
-  const [food, setFood] = React.useState({});
+  const [food, setFood] = React.useState({
+    price: 0,
+  });
   const [optionFood, setOptionFood] = React.useState([]);
-  const [checked, setChecked] = React.useState(false);
   const [amount, setAmount] = React.useState(0);
   const [checkedItems, setCheckedItems] = React.useState(
     new Array(optionFood.length).fill(false)
   );
+  const [visible, setVisible] = React.useState(false);
+
+  const onDismissSnackBar = () => setVisible(false);
 
   React.useEffect(() => {
     const foodRef = ref(database, "Food/" + foodID);
     onValue(foodRef, (snapshot) => {
-      console.log(snapshot);
       const food = snapshot.val();
       setFood(food);
       setAmount(food.price);
@@ -73,6 +61,8 @@ const BookFood = ({ route, navigation }) => {
   };
 
   const handleOrderPress = async () => {
+    const userId = await getUserToken();
+
     let selectedOptions = [];
     selectedOptions.push({ nameFood: food.name, price: food.price });
     selectedOptions.push(
@@ -83,14 +73,29 @@ const BookFood = ({ route, navigation }) => {
           price: option.priceOption,
         }))
     );
-    const historyRef = ref(database, "History/" + generateId());
+
+    const historyRef = ref(
+      database,
+      "History/" + moment().format("YYYYMMDD") + "/" + userId
+    );
     set(historyRef, {
-      userId: await getUserToken(),
+      userId: userId,
+      optionFood: selectedOptions,
+      totalPrice: amount,
+    });
+
+    const historyUserRef = ref(
+      database,
+      "HistoryUser/" + userId + "/" + moment().format("YYYYMMDD")
+    );
+    set(historyUserRef, {
       optionFood: selectedOptions,
       totalPrice: amount,
       created_at: dateTime,
       status: 1,
+      buyerId: 0,
     });
+    setVisible(!visible);
   };
   const handleCheckbox = (index) => {
     const newCheckedItems = [...checkedItems];
@@ -103,6 +108,7 @@ const BookFood = ({ route, navigation }) => {
         : -optionFood[index].priceOption);
     setAmount(newAmount);
   };
+
   const handleMomoTransfer = () => {
     const momoTransferLink =
       "momo://pay?partner=merchant_123&amount=100000&description=Đơn hàng số 1234c";
@@ -149,6 +155,7 @@ const BookFood = ({ route, navigation }) => {
         >
           <IconButton icon="heart" mode="contained" />
         </TouchableOpacity>
+
         <Image
           style={{
             height: 375,
@@ -158,36 +165,31 @@ const BookFood = ({ route, navigation }) => {
             uri: food.image,
           }}
         />
-        <Button icon="camera" mode="contained" onPress={handleMomoTransfer}>
-          Press me
-        </Button>
         <View style={styles.cardContainer}>
           <Text style={styles.foodTitle}>{food.name}</Text>
-          <Text style={styles.foodTitle}>{food.price}</Text>
+          <Text style={styles.foodTitle}>{formatNumber(food.price, ".")}</Text>
         </View>
         <View
           style={{
-            height: "0.5%",
-            backgroundColor: COLOURS.backgroundMedium,
+            height: 5,
+            backgroundColor: COLOURS.neutral2,
           }}
-        ></View>
+        />
         <View>
           <Text
             style={{
               color: COLOURS.darkBlue,
               fontSize: 16,
-              marginLeft: "5%",
-              marginTop: "3%",
+              padding: 10,
               marginBottom: "1%",
-              fontWeight: "400",
+              fontWeight: "bold",
             }}
           >
             Món thêm{" "}
             <Text
               style={{
-                color: COLOURS.darkBlue,
+                color: COLOURS.grey,
                 fontSize: 12,
-                fontWeight: "200",
               }}
             >
               Không bắt buộc
@@ -195,7 +197,11 @@ const BookFood = ({ route, navigation }) => {
           </Text>
         </View>
         <View>
-          <View>
+          <View
+            style={{
+              padding: 10,
+            }}
+          >
             {optionFood &&
               optionFood.map((food, index) => (
                 <TouchableOpacity
@@ -206,23 +212,34 @@ const BookFood = ({ route, navigation }) => {
                   <Checkbox
                     status={checkedItems[index] ? "checked" : "unchecked"}
                     onPress={() => handleCheckbox(index)}
-                    color="#FF2900"
+                    color={COLOURS.primary}
                     style={styles.checkbox}
                   />
-                  <Text style={styles.labelOptions}>{food.nameOption}</Text>
-                  <Text style={{ paddingRight: "3%" }}>
-                    + {food.priceOption}
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: COLOURS.darkBlue,
+                      fontSize: 16,
+                      paddingLeft: 8,
+                      fontWeight: checkedItems[index] ? "bold" : "normal",
+                    }}
+                  >
+                    {food.nameOption}
+                  </Text>
+                  <Text style={{ color: COLOURS.darkBlue }}>
+                    +{formatNumber(food.priceOption, ".")}
                   </Text>
                 </TouchableOpacity>
               ))}
           </View>
         </View>
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <View
+          style={{ flex: 1, justifyContent: "flex-end", paddingHorizontal: 10 }}
+        >
           <View
             style={{
-              marginHorizontal: "3%",
               justifyContent: "flex-end",
-              marginBottom: 16,
+              marginBottom: 30,
             }}
           >
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
@@ -231,12 +248,31 @@ const BookFood = ({ route, navigation }) => {
                 onPress={handleOrderPress}
                 style={{
                   borderRadius: 5,
-                  backgroundColor: "#FF2900",
+                  backgroundColor: COLOURS.primary,
                 }}
               >
-                Đặt món - {formatNumber(amount)}
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: 14,
+                  }}
+                >
+                  Đặt món - {formatNumber(amount)}
+                </Text>
               </Button>
             </View>
+            <Snackbar
+              visible={visible}
+              onDismiss={onDismissSnackBar}
+              duration={1500}
+              style={{
+                backgroundColor: `rgb(60, 179, 113)`,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Đặt món thành công
+            </Snackbar>
           </View>
         </View>
       </View>
@@ -245,9 +281,13 @@ const BookFood = ({ route, navigation }) => {
 };
 const styles = StyleSheet.create({
   foodTitle: {
+    height: 70,
+    verticalAlign: "middle",
     color: COLOURS.darkBlue,
-    fontSize: 18,
-    margin: "5%",
+    fontSize: 22,
+    paddingHorizontal: 10,
+    paddingVertical: 13,
+    lineHeight: 28,
     fontWeight: "bold",
   },
   cardContainer: {
@@ -259,7 +299,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    borderBottomColor: COLOURS.neutral3,
     paddingVertical: 8,
     marginBottom: 15,
   },
@@ -275,14 +315,6 @@ const styles = StyleSheet.create({
     borderColor: COLOURS.darkBlue,
     borderWidth: 1,
     borderRadius: 5,
-    marginLeft: "5%",
-  },
-  labelOptions: {
-    flex: 1,
-    color: COLOURS.darkBlue,
-    fontSize: 16,
-    paddingLeft: "3%",
-    fontWeight: "300",
   },
 });
 export default BookFood;

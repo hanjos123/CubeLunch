@@ -1,4 +1,11 @@
-import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import {
   COLOURS,
   PAYMENT_STATUS,
@@ -22,6 +29,7 @@ const HistoryCard = ({ data, navigation }) => {
     >
       <View
         style={{
+          width: Dimensions.get("window").width,
           flexDirection: "row",
           flexWrap: "wrap",
           justifyContent: "space-between",
@@ -51,6 +59,9 @@ const HistoryCard = ({ data, navigation }) => {
               "MM/DD/YYYY, h:mm:ss A",
               "MM/DD/YYYY, h:mm:ss",
               "MM/DD/YYYY, h:mm:ss a",
+              "DD/MM/YYYY, h:mm:ss A",
+              "DD/MM/YYYY, h:mm:ss",
+              "DD/MM/YYYY, h:mm:ss a",
             ]).format("DD [thg] M YYYY HH:mm")}
           </Text>
         </View>

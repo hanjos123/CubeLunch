@@ -8,6 +8,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Appbar } from "react-native-paper";
 
+import Screen from "./components/HeaderScreen";
 
 const Home = ({ navigation }) => {
   const [foods, setFoods] = React.useState([]);
@@ -62,6 +63,9 @@ const Home = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    height: "100%",
+  },
   headerContainer: {
     backgroundColor: "transparent",
     justifyContent: "center",

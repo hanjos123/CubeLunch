@@ -2,6 +2,9 @@ export const COLOURS = {
   primary: "#FF2B2B",
   primary2: "#FE6060",
   primary3: "#FFC3C3",
+  gradient: ["#FF7682", "#FF2900"],
+  gradient1: "#FF7682",
+  gradient2: "#FF2900",
   secondary: "#D2EBF4",
   darkBlue: "#424965",
   grey: "#928D8D",
@@ -10,13 +13,9 @@ export const COLOURS = {
   neutral3: "#C7C7C7",
   neutral4: "#AFAFAF",
   neutral5: "#909090",
+  success: "#448949",
   white: "#FAFBFF",
   black: "#000000",
-  green: "#00AC76",
-  blue: "#0043F9",
-  backgroundLight: "#F0F0F3",
-  backgroundMedium: "#B9B9B9",
-  backgroundDark: "#777777",
 };
 
 export const DAY_SHOW_FOOD = {

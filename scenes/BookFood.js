@@ -108,20 +108,7 @@ const BookFood = ({ route, navigation }) => {
         : -optionFood[index].priceOption);
     setAmount(newAmount);
   };
-
-  const handleMomoTransfer = () => {
-    const momoTransferLink =
-      "momo://pay?partner=merchant_123&amount=100000&description=Đơn hàng số 1234c";
-    // const momoTransferLink = "momo://transaction";
-
-    Linking.openURL(momoTransferLink);
-    // Linking.canOpenURL(momoTransferLink).then((supported) => {
-    //   console.log(supported);
-    //   if (supported) {
-    //     Linking.openUrl(momoTransferLink);
-    //   }
-    // });
-  };
+  
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
@@ -139,21 +126,15 @@ const BookFood = ({ route, navigation }) => {
             zIndex: 99,
           }}
           onPress={() => {
-            console.log(navigation);
             navigation.navigate("Home");
           }}
         >
-          <IconButton icon="arrow-left" mode="contained" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            top: 50,
-            right: 20,
-            zIndex: 99,
-          }}
-        >
-          <IconButton icon="heart" mode="contained" />
+          <IconButton
+            icon="arrow-left"
+            color={COLOURS.darkBlue}
+            containerColor={COLOURS.white}
+            mode="contained"
+          />
         </TouchableOpacity>
 
         <Image
@@ -257,7 +238,7 @@ const BookFood = ({ route, navigation }) => {
                     fontSize: 14,
                   }}
                 >
-                  Đặt món - {formatNumber(amount)}
+                  Đặt món - {formatNumber(amount, ".")}
                 </Text>
               </Button>
             </View>
@@ -266,7 +247,7 @@ const BookFood = ({ route, navigation }) => {
               onDismiss={onDismissSnackBar}
               duration={1500}
               style={{
-                backgroundColor: `rgb(60, 179, 113)`,
+                backgroundColor: COLOURS.success,
                 alignItems: "center",
                 justifyContent: "center",
               }}

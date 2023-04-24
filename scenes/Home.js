@@ -3,8 +3,11 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import FoodCard from "./components/FoodCard";
 import { getDatabase, ref, get, child, onValue } from "firebase/database";
 import { database } from "../firebase";
-import { DAY_SHOW_FOOD } from "../utils/constant";
+import { COLOURS, DAY_SHOW_FOOD } from "../utils/constant";
 import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Appbar } from "react-native-paper";
+
 
 const Home = ({ navigation }) => {
   const [foods, setFoods] = React.useState([]);
@@ -12,7 +15,6 @@ const Home = ({ navigation }) => {
   React.useEffect(() => {
     const foodRef = ref(database, "Food");
     onValue(foodRef, (snapshot) => {
-      console.log(snapshot);
       const data = snapshot.val();
       const food = Object.keys(data).map((key) => ({
         id: key,
@@ -23,43 +25,47 @@ const Home = ({ navigation }) => {
   }, []);
 
   return (
-    <ScrollView>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "top",
-          alignContent: "center",
-        }}
+    <SafeAreaProvider>
+      <LinearGradient
+        colors={COLOURS.gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.button}
       >
-        <LinearGradient
-          colors={["#FF7682", "#FF2900"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.headerContainer}
+        <Appbar.Header style={styles.headerContainer}>
+          <Appbar.Content
+            color={COLOURS.white}
+            title="Trưa nay ăn gì"
+          />
+        </Appbar.Header>
+      </LinearGradient>
+      <ScrollView>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "top",
+            alignContent: "center",
+          }}
         >
-          <Text style={styles.headerTitle}>Trưa nay ăn gì</Text>
-        </LinearGradient>
-        <View style={styles.cardContainer}>
-          {foods.map((food) =>
-            food.dayShow == new Date().getDay() ||
-            food.dayShow == DAY_SHOW_FOOD.ALL_DAY ? (
-              <FoodCard data={food} navigation={navigation} key={food.id} />
-            ) : null
-          )}
+          <View style={styles.cardContainer}>
+            {foods.map((food) =>
+              food.dayShow == new Date().getDay() ||
+              food.dayShow == DAY_SHOW_FOOD.ALL_DAY ? (
+                <FoodCard data={food} navigation={navigation} key={food.id} />
+              ) : null
+            )}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaProvider>
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: "#FF2900",
-    height: 90,
+    backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
   },
   headerTitle: {
     color: "#FFF",

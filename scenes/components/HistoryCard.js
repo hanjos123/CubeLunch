@@ -26,7 +26,7 @@ const HistoryCard = ({ data, navigation }) => {
           flexWrap: "wrap",
           justifyContent: "space-between",
           borderBottomWidth: 1,
-          borderBottomColor: COLOURS.backgroundMedium,
+          borderBottomColor: COLOURS.neutral2,
         }}
       >
         <View
@@ -68,7 +68,7 @@ const HistoryCard = ({ data, navigation }) => {
               color:
                 data.status === PAYMENT_STATUS.UNPAID
                   ? COLOURS.primary
-                  : COLOURS.green,
+                  : COLOURS.success,
               textTransform: "uppercase",
               justifyContent: "flex-end",
             }}

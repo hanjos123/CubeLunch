@@ -25,7 +25,6 @@ const Login = ({ navigation }) => {
       const data = await signInWithEmailAndPassword(auth, email, password);
       await AsyncStorage.setItem("userToken", data.user.uid);
       navigation.replace("Home");
-      console.log(data);
     } catch (error) {
       console.error(error);
       setErrorMessage("Đăng nhập thất bại");

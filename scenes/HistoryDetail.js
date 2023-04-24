@@ -81,8 +81,6 @@ const HistoryDetail = ({ route, navigation }) => {
     });
   }, [userId]);
 
-  console.log(historys);
-
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View
@@ -166,7 +164,7 @@ const HistoryDetail = ({ route, navigation }) => {
                 color:
                   historys?.status === PAYMENT_STATUS.UNPAID
                     ? COLOURS.primary
-                    : COLOURS.green,
+                    : COLOURS.success,
                 textTransform: "uppercase",
               }}
             >

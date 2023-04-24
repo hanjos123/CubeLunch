@@ -16,7 +16,7 @@ const FoodCard = ({ data, navigation }) => {
           width: "100%",
           height: 200,
           borderRadius: 10,
-          backgroundColor: COLOURS.backgroundLight,
+          backgroundColor: COLOURS.neutral1,
           position: "relative",
           justifyContent: "center",
           alignItems: "center",

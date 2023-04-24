@@ -7,12 +7,14 @@ import {
   Linking,
   TouchableOpacity,
   Dimensions,
+  Clipboard
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { database } from "../../firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 import { onValue, ref, set } from "firebase/database";
 import { Snackbar } from "react-native-paper";
+import { COLOURS } from "../../utils/constant";
 
 const QRMomo = ({ historyID }) => {
   const [historys, setHistorys] = React.useState({});
@@ -65,16 +67,12 @@ const QRMomo = ({ historyID }) => {
   }, [historys.buyerId]);
 
   const handleCopy = () => {
-    // Clipboard.setString(buyers.momo);
-    // Clipboard.setString("Text to copy");
+    Clipboard.setString(phoneQR);
     setVisible(!visible);
   };
 
   return (
-    <View style={{ marginTop: 20 }}>
-      <View style={{ justifyContent: "flex-start", marginLeft: 10 }}>
-        <Text style={styles.labelOptions}>Momo</Text>
-      </View>
+    <View>
       <View
         style={{
           width: 200,
@@ -90,9 +88,9 @@ const QRMomo = ({ historyID }) => {
         <QRCode
           value={momoTransferLink}
           size={200}
-          color="black"
+          color={COLOURS.darkBlue}
           logo={logoFromFile}
-          backgroundColor="white"
+          backgroundColor={COLOURS.white}
         />
         <View
           style={{
@@ -147,32 +145,5 @@ const QRMomo = ({ historyID }) => {
     </View>
   );
 };
-const styles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: "#FF2900",
-    height: 90,
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  headerTitle: {
-    color: "#FFF",
-    top: "25%",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  cardContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  labelOptions: {
-    fontStyle: "normal",
-    fontWeight: 600,
-    fontSize: 14,
-    marginLeft: 3,
-  },
-});
 
 export default QRMomo;

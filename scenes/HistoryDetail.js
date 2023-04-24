@@ -20,7 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 const HistoryDetail = ({ route, navigation }) => {
   const { historyID } = route.params;
-  const [historys, setHistorys] = React.useState({});
+  const [histories, setHistories] = React.useState({});
   const [buyerInfoList, setbuyerInfoList] = React.useState([]);
   const [firstOption, setFirstOption] = React.useState({});
   const [restOption, setRestOptions] = React.useState([]);
@@ -51,12 +51,8 @@ const HistoryDetail = ({ route, navigation }) => {
         const history = snapshot.val();
         const optionFood =
           history && history.optionFood ? history.optionFood : [];
-        const [firstOptions] =
-          optionFood.length > 0 ? optionFood.slice(0, 1) : null;
-        const restOptions = optionFood.length > 1 ? optionFood.slice(1) : null;
-        setFirstOption(firstOptions);
-        setRestOptions(restOptions);
-        setHistorys(history);
+        setFirstOption(optionFood[0]);
+        setHistories(history);
       });
     }
   }, [userId]);
@@ -72,223 +68,147 @@ const HistoryDetail = ({ route, navigation }) => {
       setbuyerInfoList(buyerInfoList);
     });
   }, []);
-  const checkBuyer = () => {
-    const matchingBuyers = [];
-    const matchingCheck = buyerInfoList.filter((buyer) => {
-      if (buyer.id === historys?.buyerId) {
-        matchingBuyers.push(buyer.name);
-      }
-    });
-    if (matchingBuyers.length > 0) {
-      return matchingBuyers[0];
-    } else {
-      return "Không có ai mua cả";
-    }
+
+  const getNameBuyer = () => {
+    const buyer = buyerInfoList.find(
+      (buyer) => buyer?.id == histories?.buyerId
+    );
+    return buyer?.name ?? "-";
   };
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#FF7682", "#FF2900"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.headerContainer}
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: 10,
+          paddingVertical: 20,
+        }}
       >
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            top: 35,
-            left: 20,
-            zIndex: 99,
-          }}
-          onPress={() => {
-            navigation.navigate("HistoryList");
-          }}
-        >
-          <IconButton icon="arrow-left" mode="contained" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Lịch sử giao dịch</Text>
-      </LinearGradient>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View
           style={{
             flex: 1,
-            justifyContent: "top",
-            alignContent: "center",
-            position: "relative",
-            width: Dimensions.get("window").width,
-            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-between",
           }}
         >
-          <View
+          <Text
             style={{
-              marginTop: 20,
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
+              textTransform: "uppercase",
+              fontWeight: "bold",
+              color: COLOURS.darkBlue,
+              fontSize: 14,
             }}
           >
+            {firstOption?.nameFood}
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: COLOURS.darkBlue,
+            }}
+          >
+            {formatNumber(histories?.totalPrice)}
+            <Text style={{ textDecorationLine: "underline" }}>đ</Text>
+          </Text>
+        </View>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 14,
+              color: COLOURS.darkBlue,
+            }}
+          >
+            {moment(histories?.created_at, [
+              "MM/DD/YYYY, h:mm:ss A",
+              "MM/DD/YYYY, h:mm:ss",
+              "MM/DD/YYYY, h:mm:ss a",
+              "DD/MM/YYYY, h:mm:ss A",
+              "DD/MM/YYYY, h:mm:ss",
+              "DD/MM/YYYY, h:mm:ss a",
+            ]).format("DD [thg] M YYYY HH:mm")}
+          </Text>
+          <Text
+            style={{
+              color:
+                histories?.status === PAYMENT_STATUS.UNPAID
+                  ? COLOURS.primary
+                  : COLOURS.success,
+              textTransform: "uppercase",
+              fontWeight: "bold",
+            }}
+          >
+            {histories?.status === PAYMENT_STATUS.UNPAID
+              ? PAYMENT_TEXT_STATUS.UNPAID
+              : PAYMENT_TEXT_STATUS.PAID}
+          </Text>
+        </View>
+
+        <View style={{ marginTop: 10 }}>
+          <Text style={styles.labelOptions}>Chi tiết đặt món</Text>
+          {histories?.optionFood?.map((history, index) => (
             <View
+              key={index}
               style={{
-                justifyContent: "flex-start",
-                marginLeft: 10,
+                flex: 1,
+                flexDirection: "row",
+                paddingLeft: 15,
+                justifyContent: "space-between",
+                marginVertical: 5,
               }}
             >
-              {
-                <>
-                  <Text
-                    style={{
-                      textTransform: "uppercase",
-                      fontStyle: "normal",
-                      fontWeight: 600,
-                      fontSize: 14,
-                      marginLeft: 3,
-                    }}
-                  >
-                    {firstOption?.nameFood}
-                  </Text>
-                  <Text>
-                    {moment(historys?.created_at, [
-                      "MM/DD/YYYY, h:mm:ss A",
-                      "MM/DD/YYYY, h:mm:ss",
-                      "MM/DD/YYYY, h:mm:ss a",
-                      "DD/MM/YYYY, h:mm:ss A",
-                      "DD/MM/YYYY, h:mm:ss",
-                      "DD/MM/YYYY, h:mm:ss a",
-                    ]).format("DD [thg] M YYYY HH:mm")}
-                  </Text>
-                </>
-              }
-            </View>
-            <View
-              style={{
-                justifyContent: "flex-start",
-                alignItems: "flex-end",
-                marginRight: 10,
-              }}
-            >
-              <Text>{historys?.totalPrice}</Text>
               <Text
                 style={{
-                  color:
-                    historys?.status === PAYMENT_STATUS.UNPAID
-                      ? COLOURS.primary
-                      : COLOURS.green,
-                  textTransform: "uppercase",
+                  fontSize: 14,
+                  color: COLOURS.darkBlue,
                 }}
               >
-                {historys?.status === PAYMENT_STATUS.UNPAID
-                  ? PAYMENT_TEXT_STATUS.UNPAID
-                  : PAYMENT_TEXT_STATUS.PAID}
+                - {history.nameFood}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: COLOURS.darkBlue,
+                }}
+              >
+                {formatNumber(history.price)}
+                <Text style={{ textDecorationLine: "underline" }}>đ</Text>
               </Text>
             </View>
-          </View>
-          <View style={{ marginTop: 20 }}>
-            <View
-              style={{
-                justifyContent: "flex-start",
-                marginLeft: 10,
-              }}
-            >
-              <Text style={styles.labelOptions}>Chi tiết đặt món</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  justifyContent: "flex-start",
-                  marginLeft: 20,
-                  marginRight: 10,
-                }}
-              >
-                <Text
-                  style={{
-                    marginTop: 10,
-                  }}
-                >
-                  - {firstOption?.nameFood}
-                </Text>
-                {restOption?.map((food, index) => (
-                  <Text
-                    style={{
-                      marginTop: 10,
-                    }}
-                    key={index}
-                  >
-                    - {food.nameFood}
-                  </Text>
-                ))}
-              </View>
-              <View
-                style={{
-                  justifyContent: "flex-start",
-                  alignContent: "flex-end",
-                  marginRight: 10,
-                }}
-              >
-                <Text
-                  style={{
-                    marginTop: 10,
-                  }}
-                >
-                  {firstOption?.price} đ
-                </Text>
-                {restOption?.map((food, index) => (
-                  <Text
-                    style={{
-                      marginTop: 10,
-                    }}
-                    key={index}
-                  >
-                    {formatNumber(food.price)} đ
-                  </Text>
-                ))}
-              </View>
-            </View>
-          </View>
-          <View style={{ marginTop: 20 }}>
-            <View
-              style={{
-                marginTop: 20,
-                flexDirection: "row",
-                flexWrap: "wrap",
-                justifyContent: "space-between",
-              }}
-            >
-              <View
-                style={{
-                  justifyContent: "flex-start",
-                  marginLeft: 10,
-                  marginRight: 10,
-                }}
-              >
-                <Text style={styles.labelOptions}>Người Mua:</Text>
-              </View>
-              <View
-                style={{
-                  justifyContent: "flex-start",
-                  marginRight: 10,
-                }}
-              >
-                <Text
-                  style={{
-                    textTransform: "uppercase",
-                    fontStyle: "normal",
-                    fontWeight: 600,
-                    fontSize: 14,
-                    marginLeft: 3,
-                  }}
-                >
-                  {checkBuyer()}
-                </Text>
-              </View>
-            </View>
-          </View>
+          ))}
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 10,
+          }}
+        >
+          <Text style={styles.labelOptions}>Người Mua:</Text>
+          <Text
+            style={{
+              textTransform: "uppercase",
+              fontWeight: "bold",
+              fontSize: 14,
+              color: COLOURS.darkBlue,
+            }}
+          >
+            {getNameBuyer()}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            marginTop: 10,
+          }}
+        >
+          <Text style={styles.labelOptions}>Momo:</Text>
           <QRMomo historyID={historyID} userId={userId} />
         </View>
       </ScrollView>
@@ -296,30 +216,10 @@ const HistoryDetail = ({ route, navigation }) => {
   );
 };
 const styles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: "#FF2900",
-    height: 90,
-    justifyContent: "center",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
-  },
-  headerTitle: {
-    color: "#FFF",
-    top: "25%",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  cardContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
   labelOptions: {
-    fontStyle: "normal",
-    fontWeight: 600,
+    fontWeight: "bold",
+    color: COLOURS.darkBlue,
     fontSize: 14,
-    marginLeft: 3,
   },
 });
 export default HistoryDetail;

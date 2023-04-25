@@ -117,16 +117,36 @@ const HistoryList = ({ navigation }) => {
               }, {})
             ).map(([month, histories]) => (
               <View key={month}>
-                <View>
+                <View style={{ paddingBottom: 10 }}>
                   <Text>{month}</Text>
                 </View>
-                {histories.map((history) => (
-                  <HistoryCard
-                    key={history.id}
-                    data={history}
-                    navigation={navigation}
-                  />
-                ))}
+                {histories
+                  .sort((a, b) => {
+                    const dateA = moment(a.created_at, [
+                      "MM/DD/YYYY, h:mm:ss A",
+                      "MM/DD/YYYY, h:mm:ss",
+                      "MM/DD/YYYY, h:mm:ss a",
+                      "DD/MM/YYYY, h:mm:ss A",
+                      "DD/MM/YYYY, h:mm:ss",
+                      "DD/MM/YYYY, h:mm:ss a",
+                    ]);
+                    const dateB = moment(b.created_at, [
+                      "MM/DD/YYYY, h:mm:ss A",
+                      "MM/DD/YYYY, h:mm:ss",
+                      "MM/DD/YYYY, h:mm:ss a",
+                      "DD/MM/YYYY, h:mm:ss A",
+                      "DD/MM/YYYY, h:mm:ss",
+                      "DD/MM/YYYY, h:mm:ss a",
+                    ]);
+                    return dateB.diff(dateA);
+                  })
+                  .map((history) => (
+                    <HistoryCard
+                      key={history.id}
+                      data={history}
+                      navigation={navigation}
+                    />
+                  ))}
               </View>
             ))}
           </View>
@@ -147,6 +167,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#E0E0E0",
+    marginBottom: 20,
   },
   headerTitle: {
     color: "#FFF",
@@ -159,10 +180,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-  },
-  naviContainer: {
-    borderTopWidth: 1,
-    borderTopColor: "#E0E0E0",
   },
 });
 

@@ -8,7 +8,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Appbar } from "react-native-paper";
 
-import Screen from "./components/HeaderScreen";
 
 const Home = ({ navigation }) => {
   const [foods, setFoods] = React.useState([]);

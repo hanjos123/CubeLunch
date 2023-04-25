@@ -7,7 +7,7 @@ import {
   Linking,
   TouchableOpacity,
   Dimensions,
-  Clipboard
+  Clipboard,
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { database } from "../../firebase";
@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"; // Import 
 import { onValue, ref, set } from "firebase/database";
 import { Snackbar } from "react-native-paper";
 import { COLOURS } from "../../utils/constant";
+import moment from "moment/moment";
 
 const QRMomo = ({ historyID }) => {
   const [historys, setHistorys] = React.useState({});
@@ -26,8 +27,8 @@ const QRMomo = ({ historyID }) => {
 
   const phoneQR = buyers?.momo;
   const amountQR = historys?.totalPrice;
-  const messageQR = "Thanh toán tiền cơm!";
-  const momoTransferLink = `2|99|${phoneQR}|${buyers?.name}|${buyers?.mail}|0|0|${amountQR}`;
+  const messageQR = "Thanh toán tiền cơm! " + moment().format("DD/MM/YYYY");
+  const momoTransferLink = `2|99|${phoneQR}|${buyers?.name}|${buyers?.mail}|0|0|${amountQR}|${messageQR}`;
   let logoFromFile = require("../../assets/icon/logo-momo.png");
 
   React.useEffect(() => {

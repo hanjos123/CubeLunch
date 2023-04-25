@@ -23,7 +23,6 @@ const HistoryCard = ({ data, navigation }) => {
       style={{
         width: "48%",
         width: "100%",
-        height: 50,
         marginBottom: 10,
       }}
     >
@@ -49,7 +48,6 @@ const HistoryCard = ({ data, navigation }) => {
               fontStyle: "normal",
               fontWeight: 600,
               fontSize: 14,
-              marginLeft: 3,
             }}
           >
             {data.optionFood[0].nameFood}
@@ -73,7 +71,10 @@ const HistoryCard = ({ data, navigation }) => {
             marginRight: 10,
           }}
         >
-          <Text>{formatNumber(data.totalPrice)}</Text>
+          <Text>
+            {formatNumber(data.totalPrice)}
+            <Text style={{ textDecorationLine: "underline" }}>đ</Text>
+          </Text>
           <Text
             style={{
               color:

@@ -203,14 +203,16 @@ const HistoryDetail = ({ route, navigation }) => {
           </Text>
         </View>
 
-        <View
-          style={{
-            marginTop: 10,
-          }}
-        >
-          <Text style={styles.labelOptions}>Momo:</Text>
-          <QRMomo historyID={historyID} userId={userId} />
-        </View>
+        {getNameBuyer() !== "-" ? (
+          <View
+            style={{
+              marginTop: 10,
+            }}
+          >
+            <Text style={styles.labelOptions}>Momo:</Text>
+            <QRMomo historyID={historyID} userId={userId} />
+          </View>
+        ) : null}
       </ScrollView>
     </View>
   );

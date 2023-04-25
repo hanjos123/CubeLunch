@@ -80,7 +80,9 @@ function StackNavigator() {
       <Stack.Screen
         name="HistoryDetail"
         component={HistoryDetail}
-        options={{ headerShown: false }}
+        options={{
+          header: (props) => <Header title="Lịch sử giao dịch" {...props}/>,
+        }}
       />
       <Stack.Screen
         name="BookFood"

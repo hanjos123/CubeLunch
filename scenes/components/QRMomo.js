@@ -21,14 +21,13 @@ const QRMomo = ({ historyID }) => {
   const [buyers, setBuyers] = React.useState({});
   const [userId, setUserToken] = React.useState(null);
   const [visible, setVisible] = React.useState(false);
-  const [momo, setMomo] = React.useState(buyers.momo);
 
   const onDismissSnackBar = () => setVisible(false);
 
   const phoneQR = buyers?.momo;
-  const amountQR = historys.totalPrice;
+  const amountQR = historys?.totalPrice;
   const messageQR = "Thanh toán tiền cơm!";
-  const momoTransferLink = `2|99|${phoneQR}|${buyers.name}|${buyers.mail}|0|0|${amountQR}`;
+  const momoTransferLink = `2|99|${phoneQR}|${buyers?.name}|${buyers?.mail}|0|0|${amountQR}`;
   let logoFromFile = require("../../assets/icon/logo-momo.png");
 
   React.useEffect(() => {
@@ -67,7 +66,7 @@ const QRMomo = ({ historyID }) => {
   }, [historys.buyerId]);
 
   const handleCopy = () => {
-    Clipboard.setString(phoneQR);
+    Clipboard.setString(buyers?.momo);
     setVisible(!visible);
   };
 
@@ -106,8 +105,8 @@ const QRMomo = ({ historyID }) => {
               alignItems: "center",
             }}
           >
-            <Text style={{ marginTop: 10 }}>{buyers.momo} </Text>
-            <Text style={{ fontWeight: "bold" }}>{buyers.name}</Text>
+            <Text style={{ marginTop: 10 }}>{buyers?.momo} </Text>
+            <Text style={{ fontWeight: "bold" }}>{buyers?.name}</Text>
           </View>
           <View
             style={{

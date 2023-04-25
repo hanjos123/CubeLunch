@@ -1,10 +1,15 @@
 /**
  * Format số (3000 => 3,000)
- * @param number
+ * @param number Số muốn forat
+ * @param string chuỗi muốn ngăn cách
  * @returns Number số sau khi format
  */
-export const formatNumber = (number, comma = ",") =>
-  number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, comma);
+export const formatNumber = (number, comma = ",") => {
+  if(!number) {
+    return '-';
+  }
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, comma);
+}
 
 /**
  * Lấy ra id mới

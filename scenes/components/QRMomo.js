@@ -24,10 +24,17 @@ const QRMomo = ({ historyID }) => {
   const [visible, setVisible] = React.useState(false);
 
   const onDismissSnackBar = () => setVisible(false);
-
+  const dateBuy = moment(historys.created_at, [
+    "MM/DD/YYYY, h:mm:ss A",
+    "MM/DD/YYYY, h:mm:ss",
+    "MM/DD/YYYY, h:mm:ss a",
+    "DD/MM/YYYY, h:mm:ss A",
+    "DD/MM/YYYY, h:mm:ss",
+    "DD/MM/YYYY, h:mm:ss a",
+  ]);
   const phoneQR = buyers?.momo;
   const amountQR = historys?.totalPrice;
-  const messageQR = "Thanh toán tiền cơm! " + moment().format("DD/MM/YYYY");
+  const messageQR = "Thanh toán tiền cơm! " + dateBuy.format("DD/MM/YYYY");
   const momoTransferLink = `2|99|${phoneQR}|${buyers?.name}|${buyers?.mail}|0|0|${amountQR}|${messageQR}`;
   let logoFromFile = require("../../assets/icon/logo-momo.png");
 
@@ -55,7 +62,6 @@ const QRMomo = ({ historyID }) => {
       setHistorys(history);
     });
   }, [userId, historyID]);
-
   React.useEffect(() => {
     if (historys.buyerId) {
       const buyerRef = ref(database, "Buyer/" + historys.buyerId);
